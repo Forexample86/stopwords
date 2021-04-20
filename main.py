@@ -2,10 +2,12 @@
 Программное средство поиска стоп-слов на gitlab.
 """
 import subprocess
-import gitlab
 import os
-import codecs
+import logging
+
 import docx
+import codecs
+import gitlab
 
 
 def searcher_rep(project_ssh):
