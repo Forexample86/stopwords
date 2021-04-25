@@ -1,63 +1,54 @@
+#!/usr/bin/env python
+
 """
 Программное средство поиска стоп-слов на gitlab.
 """
-import subprocess
-import os
-import logging
+import argparse
+import search_by_id
 
-import docx
-import codecs
-import gitlab
+"""
+Обработка аргументов в cli
+
+Methods:
+    parse_args - добавление парсера
+    check_args - проверка аргументов на корректность
+"""
 
 
-def searcher_rep(project_ssh):
+def parse_args():
     """
-    Подключение к gitwork и выгрузка проекта по ssh
-    :param project_ssh:
-    :return:
+    Args:
+        parser: парсер
+    Returns: аргументы для парсера
     """
-    url = 'https://gitwork.ru/'
-    token = 'WH-maWZt1ag1bvFsaXKT'
-    gl = gitlab.Gitlab(url, private_token=token, api_version='4')
-    gl.auth()
-
-    args = ['git', 'clone', project_ssh]
-    res = subprocess.Popen(args, stdout=subprocess.PIPE)
-    output, _error = res.communicate()
-    if not _error:
-        print(output)
-    else:
-        print(_error)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--token', type=str, default='Key', help='Enter key for work')
+    parser.add_argument('-s', '--project_ssh', type=str, default='SSH', help='Enter ssh project for clone')
+    parser.add_argument('-b', '--black_list', type=str, default=None, help='Enter path to file with black list')
+    parser.add_argument('-o', '--output', type=str, default=None, help='Enter path to file for output')
+    return parser.parse_args()
 
 
-def searcher_files(file):
+def check_args(args):
     """
-    Чтение из файла списка нехороших слов и парсинг docx файлов на анличие нехороших слов
-    :param file:
-    :return:
+    Функция проверки подаваемых аргументов
+    Args:
+        args: Словарь подаваемых аргументов
+
+    Returns:
+        True - если все верно
+
+    Raises:
+        FileNotFoundError - файл не может быть найден
+        ValueError - неверное название группы/подгруппы
     """
-    with codecs.open(file, encoding='utf-8') as fin:
-        black_list = fin.read().splitlines()
-    print(black_list)
-
-    paths = []
-    folder = os.getcwd()
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            if file.endswith('.docx') and not file.startswith('~'):
-                paths.append(os.path.join(root, file))
-
-    for path in paths:
-        doc = docx.Document(path)
-        for paragraph in doc.paragraphs:
-            text = paragraph.text.lower()
-            for key in black_list:
-                if key in text:
-                    print(f"I found {key} words")
-                else:
-                    continue
+    if not args.get('token'):
+        raise ValueError("Token not entered")
 
 
 if __name__ == '__main__':
-    searcher_rep('git@gitwork.ru:polev/test.git')
-    searcher_files(r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
+    res = search_by_id.searcher_rep('git@gitwork.ru:polev/test.git')
+    search_by_id.searcher_files()
+    search_by_id.pars_docx(search_by_id.searcher_files(), r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
+    search_by_id.pars_pptx(search_by_id.searcher_files(), r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
+    search_by_id.pars_md(search_by_id.searcher_files(), r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
