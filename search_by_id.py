@@ -86,4 +86,20 @@ def pars_pptx(paths, file):
                                 continue
 
 
+def pars_md(paths, file):
+    with codecs.open(file, encoding='utf-8') as fin:
+        black_list = fin.read().splitlines()
+    print(black_list)
+    print("Pars .md")
 
+    for elem in paths:
+        if elem.endswith('.md' or '.markdown'):
+            print(elem)
+            with codecs.open(elem, encoding='utf-8') as openfile:
+                for line in openfile:
+                    for key in black_list:
+                        if key in line:
+                            print(f"I found {key} word")
+                        else:
+                            #print("Words not found!")
+                            continue
