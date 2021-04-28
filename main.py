@@ -49,6 +49,7 @@ def check_args(args):
 if __name__ == '__main__':
     res = search_by_id.searcher_rep('git@gitwork.ru:polev/test.git')
     search_by_id.searcher_files()
-    search_by_id.pars_docx(search_by_id.searcher_files(), r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
-    search_by_id.pars_pptx(search_by_id.searcher_files(), r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
-    search_by_id.pars_md(search_by_id.searcher_files(), r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
+    search_by_id.black_list(file=r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt')
+    search_by_id.pars_docx(search_by_id.searcher_files())
+    search_by_id.pars_pptx(search_by_id.searcher_files())
+    search_by_id.pars_md(search_by_id.searcher_files())

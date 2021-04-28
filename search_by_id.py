@@ -14,9 +14,9 @@ def searcher_rep(project_ssh):
     :param project_ssh:
     :return:
     """
-    url = 'https://gitwork.ru/'
+    URL = 'https://gitwork.ru/'
     token = 'WH-maWZt1ag1bvFsaXKT'
-    gl = gitlab.Gitlab(url, private_token=token, api_version='4')
+    gl = gitlab.Gitlab(URL, private_token=token, api_version='4')
     gl.auth()
 
     args = ['git', 'clone', project_ssh]
@@ -48,17 +48,22 @@ def searcher_files():
     return paths
 
 
-def pars_docx(paths, file):
+def black_list(file=r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt'):
     with codecs.open(file, encoding='utf-8') as fin:
         black_list = fin.read().splitlines()
-    print(black_list)
+
+    return black_list
+
+
+def pars_docx(paths):
     print("Pars .docx")
+
     for elem in paths:
         if elem.endswith('.docx'):
             doc = docx.Document(elem)
             for paragraph in doc.paragraphs:
                 text = paragraph.text.lower()
-                for key in black_list:
+                for key in black_list():
                     if key in text:
                         print(f"I found {key} word")
                     else:
@@ -66,11 +71,9 @@ def pars_docx(paths, file):
                         continue
 
 
-def pars_pptx(paths, file):
-    with codecs.open(file, encoding='utf-8') as fin:
-        black_list = fin.read().splitlines()
-    print(black_list)
+def pars_pptx(paths):
     print("Pars .pptx")
+
     for elem in paths:
         if elem.endswith('.pptx'):
             prs = Presentation(elem)
@@ -78,7 +81,7 @@ def pars_pptx(paths, file):
                 for shape in slide.shapes:
                     if hasattr(shape, "text"):
                         shape.text = shape.text.lower()
-                        for key in black_list:
+                        for key in black_list():
                             if key in shape.text:
                                 print(f"I found {key} word")
                             else:
@@ -86,18 +89,14 @@ def pars_pptx(paths, file):
                                 continue
 
 
-def pars_md(paths, file):
-    with codecs.open(file, encoding='utf-8') as fin:
-        black_list = fin.read().splitlines()
-    print(black_list)
+def pars_md(paths):
     print("Pars .md")
 
     for elem in paths:
         if elem.endswith('.md' or '.markdown'):
-            print(elem)
             with codecs.open(elem, encoding='utf-8') as openfile:
                 for line in openfile:
-                    for key in black_list:
+                    for key in black_list():
                         if key in line:
                             print(f"I found {key} word")
                         else:
