@@ -1,0 +1,3 @@
+fullname: 2018-3-23-pol | stop word: docker
+fullname: 2018-3-23-pol | stop word: эвм
+fullname: 2018-3-23-pol | stop word: docker
