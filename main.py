@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Программное средство поиска стоп-слов на gitlab.
@@ -23,8 +23,8 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--token', type=str, default='Key', help='Enter key for work')
-    parser.add_argument('-s', '--project_ssh', type=str, default='SSH', help='Enter ssh project for clone')
-    parser.add_argument('-b', '--black_list', type=str, default=None, help='Enter path to file with black list')
+    parser.add_argument('-s', '--project-ssh', type=str, default='SSH', help='Enter ssh project for clone')
+    parser.add_argument('-b', '--black-list', type=str, default=None, help='Enter path to file with black list')
     parser.add_argument('-o', '--output', type=str, default=None, help='Enter path to file for output')
     return parser.parse_args()
 
@@ -47,8 +47,10 @@ def check_args(args):
 
 
 if __name__ == '__main__':
-    output = r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\output.txt'
-    black_list = r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt'
+    #output = r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\output.txt'
+    #black_list = r'C:\Users\polev\PycharmProjects\prac\2018-3-23-pol\black_list.txt'
+    output = r'output.txt'
+    black_list = r'black_list.txt'
     fullname = search_by_id.searcher_rep('git@gitwork.ru:polev/test.git')
     paths = search_by_id.searcher_files()
 
