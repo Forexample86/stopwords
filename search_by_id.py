@@ -1,13 +1,15 @@
+import csv
 import subprocess
 import os
 import logging
 import warnings as w
+from collections import Counter
 
 import docx
 from pptx import Presentation
 import codecs
 import gitlab
-from gitlab import *
+
 
 URL = 'https://gitwork.ru/'
 TOKEN = 'WH-maWZt1ag1bvFsaXKT'
@@ -33,9 +35,9 @@ def searcher_rep(project_ssh):
     # выкачиваем проект
     args = ['git', 'clone', project_ssh]
     res = subprocess.Popen(args, stdout=subprocess.PIPE)
-    output, error = res.communicate()
+    out, error = res.communicate()
     if not error:
-        print(output)
+        print(out)
     else:
         print(error)
 
@@ -69,6 +71,36 @@ def searcher_files():
     #          print(count)
     #          subprocess.Popen([args, count], stdout=subprocess.PIPE)
     return paths
+
+
+def search_expansion():
+    """
+    :return: расширения
+    """
+    suffix = ('.docx', '.doc', '.pptx', '.ppt', '.md', '.txt', '.rtf')
+    expansion = []
+    folder = os.getcwd()
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if file.endswith(suffix[0:7]) and not file.startswith('~'):
+                expansion.append(file.split(".")[-1])
+    return expansion
+
+
+def csv_out(data, path):
+    """
+    :param: file_obj
+    :return:
+    """
+    dict_data = [Counter(data)]
+    print(dict_data)
+    csv_columns = ['docx', 'txt', 'doc', 'md', 'pptx', 'rtf']
+    with open(path, "w") as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=csv_columns, dialect='excel',
+                                extrasaction='raise', restval='', delimiter=':')
+        writer.writeheader()
+        for row in dict_data:
+            writer.writerow(row)
 
 
 def black_list(file):
@@ -107,7 +139,7 @@ def pars_pptx(paths, fullname, file_b, file_o):
     print("Pars .pptx")
 
     for elem in paths:
-        if elem.endswith('.pptx'):
+        if elem.endswith('.pptx' or '.ppt'):
             prs = Presentation(elem)
             for slide in prs.slides:
                 for shape in slide.shapes:
@@ -127,7 +159,7 @@ def pars_md(paths, fullname, file_b, file_o):
     print("Pars .md")
 
     for elem in paths:
-        if elem.endswith('.md' or '.markdown'):
+        if elem.endswith('.md' or '.txt'):
             with codecs.open(elem, encoding='utf-8') as openfile:
                 for line in openfile:
                     for key in black_list(file_b):
