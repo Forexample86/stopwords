@@ -8,6 +8,7 @@ from collections import Counter
 import docx
 from pptx import Presentation
 from scripts._blacklist import BlackList
+from scripts._work import Work
 import codecs
 import gitlab
 
@@ -121,60 +122,97 @@ def output(fullname, word, file):
     return out
 
 
-def pars_docx(paths, fullname, file_b, file_o):
-    print("Pars .docx")
+def pars_files(paths, fullname, file_b, file_o):
+    print("Pars .md")
+    work = Work(paths, fullname, file_b, file_o)
 
     for elem in paths:
+        if elem.endswith('.md' or '.txt'):
+            check_word(elem, work)
+
+        if elem.endswith('.pptx' or '.ppt'):
+            check_pptx(elem, work)
+
         if elem.endswith('.docx'):
-            doc = docx.Document(elem)
-            for paragraph in doc.paragraphs:
-                text = paragraph.text.lower()
-                for key in black_list(file_b):
-                    if key in text:
+            check_docx(elem, work)
+
+
+def check_word(elem, work):
+    with codecs.open(elem, encoding='utf-8') as openfile:
+        for line in openfile:
+            for key in black_list(work.file_b):
+                if key in line:
+                    print(f"I found {key} word")
+                    output(work.fullname, key, work.file_o)
+                else:
+                    # print("Words not found!")
+                    continue
+                return key
+
+
+def check_pptx(elem, work):
+    prs = Presentation(elem)
+    for slide in prs.slides:
+        for shape in slide.shapes:
+            if hasattr(shape, "text"):
+                shape.text = shape.text.lower()
+                for key in black_list(work.file_b):
+                    if key in shape.text:
                         print(f"I found {key} word")
-                        output(fullname, key, file_o)
+                        output(work.fullname, key, work.file_o)
                     else:
                         # print("Words not found!")
                         continue
                     return key
 
 
-def pars_pptx(paths, fullname, file_b, file_o):
-    print("Pars .pptx")
+def check_docx(elem, work):
+    doc = docx.Document(elem)
+    for paragraph in doc.paragraphs:
+        text = paragraph.text.lower()
+        for key in black_list(work.file_b):
+            if key in text:
+                print(f"I found {key} word")
+                output(work.fullname, key, work.file_o)
+            else:
+                # print("Words not found!")
+                continue
+            return key
 
-    for elem in paths:
-        if elem.endswith('.pptx' or '.ppt'):
-            prs = Presentation(elem)
-            for slide in prs.slides:
-                for shape in slide.shapes:
-                    if hasattr(shape, "text"):
-                        shape.text = shape.text.lower()
-                        for key in black_list(file_b):
-                            if key in shape.text:
-                                print(f"I found {key} word")
-                                output(fullname, key, file_o)
-                            else:
-                                # print("Words not found!")
-                                continue
-                            return key
-
-
-def pars_md(paths, fullname, file_b, file_o):
-    print("Pars .md")
-
-    for elem in paths:
-        if elem.endswith('.md' or '.txt'):
-            check_word(elem, fullname. fullname, file_b, file_o)
-
-
-def check_word(elem, fullname, file_b, file_o):
-    with codecs.open(elem, encoding='utf-8') as openfile:
-        for line in openfile:
-            for key in black_list(file_b):
-                if key in line:
-                    print(f"I found {key} word")
-                    output(fullname, key, file_o)
-                else:
-                    # print("Words not found!")
-                    continue
-                return key
+#
+# def pars_docx(paths, fullname, file_b, file_o):
+#     print("Pars .docx")
+#
+#     for elem in paths:
+#         if elem.endswith('.docx'):
+#             doc = docx.Document(elem)
+#             for paragraph in doc.paragraphs:
+#                 text = paragraph.text.lower()
+#                 for key in black_list(file_b):
+#                     if key in text:
+#                         print(f"I found {key} word")
+#                         output(fullname, key, file_o)
+#                     else:
+#                         # print("Words not found!")
+#                         continue
+#                     return key
+#
+#
+# def pars_pptx(paths, fullname, file_b, file_o):
+#     print("Pars .pptx")
+#
+#     for elem in paths:
+#         if elem.endswith('.pptx' or '.ppt'):
+#             prs = Presentation(elem)
+#             for slide in prs.slides:
+#                 for shape in slide.shapes:
+#                     if hasattr(shape, "text"):
+#                         shape.text = shape.text.lower()
+#                         for key in black_list(file_b):
+#                             if key in shape.text:
+#                                 print(f"I found {key} word")
+#                                 output(fullname, key, file_o)
+#                             else:
+#                                 # print("Words not found!")
+#                                 continue
+#                             return key
