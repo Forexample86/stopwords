@@ -4,13 +4,6 @@ import logging
 import warnings as w
 from collections import Counter
 
-import docx
-from pptx import Presentation
-from scripts._blacklist import BlackList
-from scripts._work import Work
-import codecs
-import gitlab
-
 
 def searcher_files():
     """

@@ -13,7 +13,7 @@ class Work:
     file_o = None
 
     def __init__(self, paths, fullname, file_b, file_o):
-        path = paths
-        fullname = fullname
-        file_b = file_b
-        file_o = file_o
+        self.path = paths
+        self.fullname = fullname
+        self.file_b = file_b
+        self.file_o = file_o

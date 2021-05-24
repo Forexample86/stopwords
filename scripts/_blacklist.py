@@ -18,7 +18,7 @@ class BlackList:
         self.file_o = None
         self.project = None
 
-    def get_connect(self):
+    def get_connect(self, token=None):
         self.git = gitlab.Gitlab(URL, private_token=TOKEN, api_version='4')
         self.git.auth()
         return self.git
