@@ -1,5 +1,4 @@
 import csv
-import subprocess
 import os
 import logging
 import warnings as w
@@ -11,37 +10,6 @@ from scripts._blacklist import BlackList
 from scripts._work import Work
 import codecs
 import gitlab
-
-
-def searcher_rep(project_ssh):
-    """
-    Подключение к gitwork и выгрузка проекта по ssh
-    :param project_ssh:
-    :return:
-    """
-    # git@gitwork.ru:polev/test.git
-    # https://gitwork.ru/polev/test.git
-
-    try:
-        gl = BlackList()
-        gl = gl.get_connect()
-    except gitlab.GitlabAuthenticationError as err:
-        w.warn(err.error_message, Warning)
-        return err.error_message
-
-    # Получаем проект
-    get = get_project(project_ssh)
-
-    # fullname
-    try:
-        projects = gl.projects.list()
-        for project in projects:
-            if project.ssh_url_to_repo == project_ssh:
-                project_ = project
-                print(project_.namespace["name"])
-                return project_.namespace["name"]
-    except gitlab.GitlabListError as err:
-        w.warn(err.error_message, Warning)
 
 
 def searcher_files():
@@ -76,19 +44,6 @@ def search_expansion():
             if file.endswith(suffix[0:7]) and not file.startswith('~'):
                 expansion.append(file.split(".")[-1])
     return expansion
-
-
-def get_project(project_ssh):
-    # выкачиваем проект
-    args = ['git', 'clone', project_ssh]
-    res = subprocess.Popen(args, stdout=subprocess.PIPE)
-    out, error = res.communicate()
-    if not error:
-        print(out)
-        return out
-    else:
-        print(error)
-        return error
 
 
 def csv_out(data, path):
@@ -216,3 +171,35 @@ def check_docx(elem, work):
 #                                 # print("Words not found!")
 #                                 continue
 #                             return key
+
+
+#
+# def searcher_rep(project_ssh):
+#     """
+#     Подключение к gitwork и выгрузка проекта по ssh
+#     :param project_ssh:
+#     :return:
+#     """
+#     # git@gitwork.ru:polev/test.git
+#     # https://gitwork.ru/polev/test.git
+#
+#     try:
+#         gl = BlackList()
+#         gl = gl.get_connect()
+#     except gitlab.GitlabAuthenticationError as err:
+#         w.warn(err.error_message, Warning)
+#         return err.error_message
+#
+#     # Получаем проект
+#     get = get_project(project_ssh)
+#
+#     # fullname
+#     try:
+#         projects = gl.projects.list()
+#         for project in projects:
+#             if project.ssh_url_to_repo == project_ssh:
+#                 project_ = project
+#                 print(project_.namespace["name"])
+#                 return project_.namespace["name"]
+#     except gitlab.GitlabListError as err:
+#         w.warn(err.error_message, Warning)
