@@ -7,12 +7,9 @@ from collections import Counter
 
 import docx
 from pptx import Presentation
+from scripts._blacklist import BlackList
 import codecs
 import gitlab
-
-
-URL = 'https://gitwork.ru/'
-TOKEN = 'WH-maWZt1ag1bvFsaXKT'
 
 
 def searcher_rep(project_ssh):
@@ -23,23 +20,16 @@ def searcher_rep(project_ssh):
     """
     # git@gitwork.ru:polev/test.git
     # https://gitwork.ru/polev/test.git
-    gl = None
+
     try:
-        gl = gitlab.Gitlab(URL, private_token=TOKEN, api_version='4')
-        gl.auth()
+        gl = BlackList()
+        gl = gl.get_connect()
     except gitlab.GitlabAuthenticationError as err:
-        print(err.error_message)
         w.warn(err.error_message, Warning)
         return err.error_message
 
-    # выкачиваем проект
-    args = ['git', 'clone', project_ssh]
-    res = subprocess.Popen(args, stdout=subprocess.PIPE)
-    out, error = res.communicate()
-    if not error:
-        print(out)
-    else:
-        print(error)
+    # Получаем проект
+    get = get_project(project_ssh)
 
     # fullname
     try:
@@ -87,8 +77,22 @@ def search_expansion():
     return expansion
 
 
+def get_project(project_ssh):
+    # выкачиваем проект
+    args = ['git', 'clone', project_ssh]
+    res = subprocess.Popen(args, stdout=subprocess.PIPE)
+    out, error = res.communicate()
+    if not error:
+        print(out)
+        return out
+    else:
+        print(error)
+        return error
+
+
 def csv_out(data, path):
     """
+    Выводит в файл csv
     :param: file_obj
     :return:
     """
@@ -160,20 +164,17 @@ def pars_md(paths, fullname, file_b, file_o):
 
     for elem in paths:
         if elem.endswith('.md' or '.txt'):
-            with codecs.open(elem, encoding='utf-8') as openfile:
-                for line in openfile:
-                    for key in black_list(file_b):
-                        if key in line:
-                            print(f"I found {key} word")
-                            output(fullname, key, file_o)
-                        else:
-                            # print("Words not found!")
-                            continue
-                        return key
+            check_word(elem, fullname. fullname, file_b, file_o)
 
 
-with w.catch_warnings(record=True) as warnings:
-    w.simplefilter("always")
-
-for out in warnings:
-    print(str(out.message))
+def check_word(elem, fullname, file_b, file_o):
+    with codecs.open(elem, encoding='utf-8') as openfile:
+        for line in openfile:
+            for key in black_list(file_b):
+                if key in line:
+                    print(f"I found {key} word")
+                    output(fullname, key, file_o)
+                else:
+                    # print("Words not found!")
+                    continue
+                return key
