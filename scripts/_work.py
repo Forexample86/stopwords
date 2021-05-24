@@ -4,6 +4,9 @@
 
 
 class Work:
+    """
+    Класс для программы
+    """
     path = None
     fullname = None
     file_b = None
