@@ -5,6 +5,7 @@ import subprocess
 
 import gitlab
 
+from scripts.functions import get_project
 URL = 'https://gitwork.ru/'
 TOKEN = 'WH-maWZt1ag1bvFsaXKT'
 
@@ -13,6 +14,7 @@ class BlackList:
     def __init__(self):
         self.git = None
         self.paths = None
+        self.ssh = None
         self.fullname = None
         self.file_b = None
         self.file_o = None
@@ -30,27 +32,22 @@ class BlackList:
         self.file_o = file_o
 
     def get_project_by_ssh(self, ssh):
+        """
+        Получение project
+        Args:
+            ssh:
 
-        # Получаем проект
+        Returns:
+
+        """
         get = get_project(ssh)
+        self.ssh = ssh
 
+    def get_fullname(self):
         # fullname
         projects = self.git.projects.list()
         for project in projects:
-            if project.ssh_url_to_repo == ssh:
+            if project.ssh_url_to_repo == self.ssh:
                 self.project = project
-                print(self.project.namespace["name"])
-                return self.project.namespace["name"]
-
-
-def get_project(project_ssh):
-    # выкачиваем проект
-    args = ['git', 'clone', project_ssh]
-    res = subprocess.Popen(args, stdout=subprocess.PIPE)
-    out, error = res.communicate()
-    if not error:
-        print(out)
-        return out
-    else:
-        print(error)
-        return error
+                self.fullname = self.project.namespace["name"]
+                return self.fullname

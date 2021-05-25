@@ -1,59 +1,24 @@
-import csv
-import os
-import logging
-import warnings as w
-from collections import Counter
+"""
+Функция поиска слов по ssh
+"""
+from scripts import functions as f
+from scripts._blacklist import BlackList
+
+OUTPUT = r'data\output.txt'
+BLACK_LIST = r'data\black_list.txt'
+FILE_CSV = r'data\formats.csv'
 
 
-def searcher_files():
-    """
-    :return: paths
-    """
-    suffix = ('.docx', '.doc', '.pptx', '.md')
-    paths = []
-    folder = os.getcwd()
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            if file.endswith(suffix) and not file.startswith('~'):
-                paths.append(os.path.join(root, file))
-    #  Конвертер doc в docx(работает в linux через libre office)
-    #  args = ['soffice', '--headless', '--convert-to', 'docx', ]
-    #  for count in paths:
-    #      if count.endswith('.doc'):
-    #          print(count)
-    #          subprocess.Popen([args, count], stdout=subprocess.PIPE)
-    return paths
+def search_by_ssh(ssh):
+    black = BlackList()
 
+    black.get_project_by_ssh(ssh)
+    fullname = black.get_fullname()
 
-def search_expansion():
-    """
-    :return: расширения
-    """
-    suffix = ('.docx', '.doc', '.pptx', '.ppt', '.md', '.txt', '.rtf')
-    expansion = []
-    folder = os.getcwd()
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            if file.endswith(suffix[0:7]) and not file.startswith('~'):
-                expansion.append(file.split(".")[-1])
-    return expansion
+    paths = f.return_paths()
 
-
-def csv_out(data, path):
-    """
-    Выводит в файл csv
-    :param: file_obj
-    :return:
-    """
-    dict_data = [Counter(data)]
-    print(dict_data)
-    csv_columns = ['docx', 'txt', 'doc', 'md', 'pptx', 'rtf']
-    with open(path, "w") as csv_file:
-        writer = csv.DictWriter(csv_file, fieldnames=csv_columns, dialect='excel',
-                                extrasaction='raise', restval='', delimiter=':')
-        writer.writeheader()
-        for row in dict_data:
-            writer.writerow(row)
+    ret = f.pars_files(paths, fullname, BLACK_LIST, OUTPUT)
+    f.csv_out(ret, FILE_CSV)
 
 
 #
@@ -125,3 +90,4 @@ def csv_out(data, path):
 #                 return project_.namespace["name"]
 #     except gitlab.GitlabListError as err:
 #         w.warn(err.error_message, Warning)
+

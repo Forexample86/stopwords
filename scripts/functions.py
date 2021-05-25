@@ -1,12 +1,19 @@
 """
 Функции для работы
 """
+import os
 
 import docx
 from pptx import Presentation
 from scripts._blacklist import BlackList
-from scripts._work import Work
+import logging
+import warnings as w
 import codecs
+import csv
+import subprocess
+
+from scripts._work import Work
+from collections import Counter
 
 
 def black_list(file):
@@ -15,15 +22,9 @@ def black_list(file):
     return black
 
 
-def output(work, key):
-    text = f"fullname:  {work.fullname}  ' | '  stop word: {key}"
-    with codecs.open(work.file_o, "a", encoding='utf-8') as fin:
-        out = fin.write(text + '\n')
-        fin.close()
-    return out
-
-
 def pars_files(paths, fullname, file_b, file_o):
+    # fle_b - blacklist file
+    # paths -
     """
     Функция парсинга файлов
     Args:
@@ -116,3 +117,77 @@ def check_docx(elem, work):
                 # print("Words not found!")
                 continue
             return key
+
+
+def return_paths():
+    """
+    Функция возврата файлов с расширениями
+    :return: paths
+    """
+    suffix = ('.docx', '.doc', '.pptx', '.md')
+    paths = []
+    folder = os.getcwd()
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if file.endswith(suffix) and not file.startswith('~'):
+                paths.append(os.path.join(root, file))
+    #  Конвертер doc в docx(работает в linux через libre office)
+    #  args = ['soffice', '--headless', '--convert-to', 'docx', ]
+    #  for count in paths:
+    #      if count.endswith('.doc'):
+    #          print(count)
+    #          subprocess.Popen([args, count], stdout=subprocess.PIPE)
+    return paths
+
+
+def search_expansion():
+    """
+    :return: расширения
+    """
+    suffix = ('.docx', '.doc', '.pptx', '.ppt', '.md', '.txt', '.rtf')
+    expansion = []
+    folder = os.getcwd()
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if file.endswith(suffix[0:7]) and not file.startswith('~'):
+                expansion.append(file.split(".")[-1])
+    return expansion
+
+
+def output(work, key):
+    text = f"fullname:  {work.fullname}  ' | '  stop word: {key}"
+    with codecs.open(work.file_o, "a", encoding='utf-8') as fin:
+        out = fin.write(text + '\n')
+        fin.close()
+    return out
+
+
+def csv_out(data, path):
+    """
+    Выводит в файл csv
+    :param: file_obj - название файла
+
+    :return:
+    """
+    dict_data = [Counter(data)]
+    print(dict_data)
+    csv_columns = ['docx', 'txt', 'doc', 'md', 'pptx', 'rtf']
+    with open(path, "w") as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=csv_columns, dialect='excel',
+                                extrasaction='raise', restval='', delimiter=':')
+        writer.writeheader()
+        for row in dict_data:
+            writer.writerow(row)
+
+
+def get_project(project_ssh):
+    # выкачиваем проект
+    args = ['git', 'clone', project_ssh]
+    res = subprocess.Popen(args, stdout=subprocess.PIPE)
+    out, error = res.communicate()
+    if not error:
+        print(out)
+        return out
+    else:
+        print(error)
+        return error
