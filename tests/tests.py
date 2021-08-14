@@ -15,13 +15,19 @@ class TestMethods(unittest.TestCase):
         self.assertEqual(methods.black_list(r'.\blacklist'), ['эвм', 'докер'])
 
     def test_clear_file(self):
-        self.assertTrue(methods.clear_file(r'..\data\output.txt'))
+        self.assertTrue(methods.clear_file_logger(r'..\data\output.txt'))
+
+    def test_clear_wrong_csv(self):
+        with self.assertRaises(FileNotFoundError) as context:
+            methods.clear_file_csv('./wrong_file.csv')
+        self.assertTrue('Системе не удается найти указанный путь '
+                        './wrong_file.csv' in str(context.exception))
 
     def test_get_proj_name(self):
         ssh = 'git@gitlab.com:test_id-/test_project.git'
         self.assertEqual(methods.get_proj_name(ssh), 'test_project')
 
-    def get_wrong_proj(self):
+    def test_get_wrong_proj(self):
         with self.assertRaises(OSError) as context:
             methods.get_project('wrong_ssh')
         self.assertTrue('Ошибка загрузки' in str(context.exception))

@@ -7,7 +7,7 @@ import sys
 from search_by_id import search_by_ssh
 from search_all import search_all
 from scripts.args import parse_args, check_args
-from scripts.methods import clear_file
+from scripts.methods import clear_file_logger, clear_file_csv
 
 # Дефолтные места
 OUTPUT = r'data\output.txt'
@@ -26,7 +26,8 @@ if __name__ == '__main__':
     FILE_CSV = ARGS.file_formats
     try:
         check_args(ARGS)
-        clear_file(FILE_OUTPUT)
+        clear_file_logger(FILE_OUTPUT)
+        clear_file_csv(FILE_CSV)
         if ALL:
             search_all(TOKEN, FILE_OUTPUT, BLACK_LIST, FILE_CSV)
         search_by_ssh(SSH, TOKEN, FILE_OUTPUT, BLACK_LIST, FILE_CSV)

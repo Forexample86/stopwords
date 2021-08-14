@@ -49,7 +49,10 @@ def pars_files(paths, fullname, file_b, file_o, file_csv):
             check_pptx(elem, work)
 
         if elem.endswith('.docx'):
-            check_docx(elem, work)
+            try:
+                check_docx(elem, work)
+            except docx.opc.exceptions.PackageNotFoundError:
+                check_word(elem, work)
 
 
 def check_word(elem, work):
@@ -104,6 +107,7 @@ def check_docx(elem, work):
     Returns:
 
     """
+
     doc = docx.Document(elem)
     black = black_list(work.file_b)
 
@@ -264,7 +268,7 @@ def delete_project(name):
         raise FileNotFoundError(f.strerror + ' ' + f.filename) from f
 
 
-def clear_file(file):
+def clear_file_logger(file):
     """
     Очистка файла логгирования перед запуском
     :return: None
@@ -273,3 +277,13 @@ def clear_file(file):
         f.truncate(0)
         f.close()
     return True
+
+
+def clear_file_csv(file):
+    try:
+        df = pd.read_csv(file, sep=':')
+        for n in ['word', 'pptx', 'docx']:
+            df.loc[0, n] = 0
+        df.to_csv(file, index=False, sep=':')
+    except FileNotFoundError as f:
+        raise FileNotFoundError('Системе не удается найти указанный путь ' + f.filename) from f
