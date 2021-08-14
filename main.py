@@ -25,10 +25,8 @@ if __name__ == '__main__':
     FILE_OUTPUT = ARGS.output
     FILE_CSV = ARGS.file_formats
     try:
-
         check_args(ARGS)
         clear_file(FILE_OUTPUT)
-
         if ALL:
             search_all(TOKEN, FILE_OUTPUT, BLACK_LIST, FILE_CSV)
         search_by_ssh(SSH, TOKEN, FILE_OUTPUT, BLACK_LIST, FILE_CSV)
@@ -36,5 +34,7 @@ if __name__ == '__main__':
         sys.exit(v)
     except FileNotFoundError as f:
         sys.exit(f)
+    except ConnectionError as c:
+        sys.exit(c)
     except Exception as e:
-        print()
+        print(e)

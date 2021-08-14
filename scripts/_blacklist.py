@@ -3,7 +3,7 @@
 """
 import gitlab
 import scripts.methods as s
-URL = 'https://gitwork.ru/'
+URL = 'https://gitlab.com/'
 TOKEN = 'pKyazBjugLXmwy7Hn1b1'
 
 
