@@ -225,7 +225,7 @@ def get_proj_name(ssh):
     :param ssh: строка
     :return: имя проекта
     """
-    name = ssh.rpartition('/')
+    name = ssh.rpartition('/')[2]
     return name.rpartition('.')[0]
 
 

@@ -36,5 +36,3 @@ if __name__ == '__main__':
         sys.exit(f)
     except ConnectionError as c:
         sys.exit(c)
-    except Exception as e:
-        print(e)

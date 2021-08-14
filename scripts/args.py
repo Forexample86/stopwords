@@ -55,3 +55,6 @@ def check_args(args):
             fin.close()
     except FileNotFoundError as err:
         raise FileNotFoundError('Не могу открыть файл blacklist') from err
+
+    if not args.project_ssh:
+        raise ValueError('Вы не ввели ssh! ')
