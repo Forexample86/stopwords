@@ -25,7 +25,7 @@ def search_all(token, output, blacklist, file_csv):
         project_name = project.name
         fullname = black.get_fullname(project_name)
         paths = f.return_paths()
-        print('Ищу файлы.. ')
+        print('Ищу в файлах.. ')
         # Парсим, выводим нужное
         ret = f.pars_files(paths, fullname, blacklist, output)
         f.csv_out(ret, file_csv)
