@@ -1,4 +1,13 @@
+"""
+Создание аргументов для программы
+"""
 import argparse
+import codecs
+
+OUTPUT = r'data\output.txt'
+BLACK_LIST = r'data\black_list.txt'
+FILE_CSV = r'data\formats.csv'
+
 """
 Обработка аргументов в cli
 
@@ -7,19 +16,20 @@ Methods:
     check_args - проверка аргументов на корректность
 """
 
+# pylint: disable = line-too-long
 
 def parse_args():
     """
     Args:
-        parser: парсер
     Returns: аргументы для парсера
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--token', type=str, default='Key', help='Enter key for work')
-    parser.add_argument('-s', '--project-ssh', type=str, default='SSH', help='Enter ssh project for clone')
-    parser.add_argument('-b', '--black-list', type=str, default=None, help='Enter path to file with black list')
-    parser.add_argument('-o', '--output', type=str, default=None, help='Enter path to file for output')
-    parser.add_argument('-f', '--file_formats', type=str, default=None, help='Enter path to csv file for output formats')
+    parser.add_argument('-a', '--all', action='store_true', default=False, help='Scan for all projects')
+    parser.add_argument('-s', '--project_ssh', type=str, default=None, help='Enter ssh project for clone')
+    parser.add_argument('-b', '--black_list', type=str, default=r'data\black_list.txt', help='Enter path to file with black list')
+    parser.add_argument('-o', '--output', type=str, default=r'data\output.txt', help='Enter path to file for output')
+    parser.add_argument('-f', '--file_formats', type=str, default=r'data\formats.csv', help='Enter path to csv file for output formats')
     return parser.parse_args()
 
 
@@ -37,4 +47,10 @@ def check_args(args):
         ValueError - неверное название группы/подгруппы
     """
     if not args.get('token'):
-        raise ValueError("Token not entered")
+        raise ValueError('Вы не ввели токен! ')
+
+    try:
+        with codecs.open(args.get('token'), 'r', encoding='utf-8') as fin:
+            fin.close()
+    except FileNotFoundError as err:
+        raise FileNotFoundError('Не могу открыть файл blacklist') from err

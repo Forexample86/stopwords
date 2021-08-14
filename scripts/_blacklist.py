@@ -1,16 +1,16 @@
 """
 Класс работы с blacklist
 """
-import subprocess
-
 import gitlab
-
-from scripts.functions import get_project
+import scripts.methods as s
 URL = 'https://gitwork.ru/'
-TOKEN = 'WH-maWZt1ag1bvFsaXKT'
+TOKEN = 'pKyazBjugLXmwy7Hn1b1'
 
 
 class BlackList:
+    """
+    Класс для парсинга проектов
+    """
     def __init__(self):
         self.git = None
         self.paths = None
@@ -20,34 +20,37 @@ class BlackList:
         self.file_o = None
         self.project = None
 
-    def get_connect(self, token=None):
-        self.git = gitlab.Gitlab(URL, private_token=TOKEN, api_version='4')
-        self.git.auth()
-        return self.git
+    def get_connect(self, token):
+        """
+        Получение объекта соединения с git
+        :param token: токен доступа
+        :return: объект соединения
+        """
+        try:
+            self.git = gitlab.Gitlab(URL, private_token=token, api_version='4')
+            self.git.auth()
+        except gitlab.GitlabAuthenticationError as err:
+            raise ConnectionError('Ошибка входа в git!') from err
 
-    def set_parse(self, paths, fullname, file_b, file_o):
-        self.paths = paths
-        self.fullname = fullname
-        self.file_b = file_b
-        self.file_o = file_o
+        return self.git
 
     def get_project_by_ssh(self, ssh):
         """
         Получение project
         Args:
-            ssh:
-
-        Returns:
+            ssh: доступ
 
         """
-        get = get_project(ssh)
+        s.get_project(ssh)
         self.ssh = ssh
 
-    def get_fullname(self):
+    def get_fullname(self, name):
+        """
+        Получение имя пользователя проекта
+        :return: fullname
+        """
         # fullname
-        projects = self.git.projects.list()
-        for project in projects:
-            if project.ssh_url_to_repo == self.ssh:
-                self.project = project
-                self.fullname = self.project.namespace["name"]
-                return self.fullname
+        project = self.git.projects.list(search=name)
+        self.project = project
+        self.fullname = self.project.name
+        return self.fullname
