@@ -211,12 +211,18 @@ def get_project(project_ssh):
     """
     # выкачиваем проект
     args = ['git', 'clone', project_ssh]
+    """
     res = subprocess.Popen(args, stdout=subprocess.PIPE)
     out, error = res.communicate()
     if not error:
         return out
     print(error)
     return error
+    """
+    try:
+        subprocess.check_output(args)
+    except subprocess.CalledProcessError as e:
+        raise OSError from e
 
 
 def get_proj_name(ssh):

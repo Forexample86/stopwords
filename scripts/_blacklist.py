@@ -50,7 +50,7 @@ class BlackList:
         :return: fullname
         """
         # fullname
-        project = self.git.projects.list(search=name)
+        project = self.git.projects.list(search=name)[0]
         self.project = project
         self.fullname = self.project.name
         return self.fullname
