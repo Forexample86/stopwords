@@ -6,7 +6,6 @@ import re
 import shutil
 import stat
 import codecs
-import csv
 
 import subprocess
 from os import path
@@ -40,7 +39,8 @@ def pars_files(paths, fullname, file_b, file_o, file_csv):
     :param file_csv: файл для статистики
     """
 
-    work = Work(paths, fullname, file_b, file_o, file_csv)
+    work = Work(paths, fullname)
+    work.set_files(file_b, file_o, file_csv)
     for elem in paths:
         if elem.endswith('.md' or '.txt'):
             check_word(elem, work)
@@ -99,10 +99,10 @@ def check_pptx(elem, work):
 
 def check_docx(elem, work):
     """
-    Проверка docx
+
     Args:
-        elem: изучаемый объект
-        work: класс с переменными
+        elem: исследуемый элемент
+        work: класс для работы с файлами
 
     Returns:
 
@@ -122,9 +122,12 @@ def check_docx(elem, work):
 def parse(text, blacklist):
     """
     Парс файлов
-    :param text: текст для парса
-    :param blacklist: список плохих слов
-    :return:
+    Args:
+        text: текст для парса
+        blacklist: список плохих слов
+
+    Returns: искомое слово из blacklist, если найдено
+
     """
     morph = pymorphy2.MorphAnalyzer()
     for key in blacklist:
@@ -145,8 +148,8 @@ def parse(text, blacklist):
 
 def return_paths():
     """
-    Функция возврата файлов с расширениями
-    :return: paths
+    Возврат пути до файлов с расширениями
+    :return: пути к файлам
     """
     suffix = ('.docx', '.doc', '.pptx', '.md')
     paths = []
@@ -184,7 +187,7 @@ def output(work, key):
     Вывод в файл пользователя и найденное плохое слово
     :param work: класс для работы
     :param key: плохое слово
-    :return:
+    :return: запись
     """
     text = f"fullname:  {work.fullname}  ' | '  stop word: {key}"
     with codecs.open(work.file_o, "a", encoding='utf-8') as fin:
@@ -199,45 +202,23 @@ def csv_out(data, path_to_csv):
     :param: data - нужная колонка
     :param: path_to_csv - путь до файла
 
-    :return:
     """
-    """
-    dict_data = [Counter(data)]
-    print(dict_data)
-    csv_columns = ['docx', 'txt', 'doc', 'md', 'pptx', 'rtf']
-    with open(path_to_csv, "w") as csv_file:
-        writer = csv.DictWriter(csv_file, fieldnames=csv_columns, dialect='excel',
-                                extrasaction='raise', restval='', delimiter=':')
-        writer.writeheader()
-        for row in dict_data:
-            writer.writerow(row)
 
-    """
     df = pd.read_csv(path_to_csv, sep=':')
     df.loc[0, data] += 1
-
     df.to_csv(path_to_csv, index=False, sep=':')
 
 
 def get_project(project_ssh):
     """
     :param project_ssh:
-    :return: Вывод
     """
     # выкачиваем проект
     args = ['git', 'clone', project_ssh]
-    """
-    res = subprocess.Popen(args, stdout=subprocess.PIPE)
-    out, error = res.communicate()
-    if not error:
-        return out
-    print(error)
-    return error
-    """
     try:
         subprocess.check_output(args)
-    except subprocess.CalledProcessError as e:
-        raise OSError('Ошибка загрузки') from e
+    except subprocess.CalledProcessError as err:
+        raise OSError('Ошибка загрузки') from err
 
 
 def get_proj_name(ssh):
@@ -254,7 +235,6 @@ def delete_project(name):
     """
     Удаление проекта
     :param name: название
-    :return: None
     """
     try:
         path_to_dir = './' + name
@@ -267,11 +247,13 @@ def delete_project(name):
     except FileNotFoundError as f:
         raise FileNotFoundError(f.strerror + ' ' + f.filename) from f
 
+# pylint: disable = invalid-name
+
 
 def clear_file_logger(file):
     """
     Очистка файла логгирования перед запуском
-    :return: None
+    :param: file: путь до файла
     """
     with open(file, "w") as f:
         f.truncate(0)
@@ -280,6 +262,10 @@ def clear_file_logger(file):
 
 
 def clear_file_csv(file):
+    """
+    Очиста файла статистики
+    :param file: путь до файла
+    """
     try:
         df = pd.read_csv(file, sep=':')
         for n in ['word', 'pptx', 'docx']:
