@@ -22,11 +22,8 @@ def search_by_ssh(ssh, token, output, blacklist, file_csv):
     # Получаем пути и парсим файлы
     paths = f.return_paths()
     print('Ищу в файлах.. ')
-    ret = f.pars_files(paths, fullname, blacklist, output)
+    f.pars_files(paths, fullname, blacklist, output, file_csv)
 
-    # Выводим в файл
-    if ret:
-        f.csv_out(ret, file_csv)
-
+    # Удаляем проект
     f.delete_project(project_name.lower())
     print('Проект ' + fullname + ' удален. ')

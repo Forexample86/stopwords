@@ -7,9 +7,10 @@ import shutil
 import stat
 import codecs
 import csv
+
 import subprocess
 from os import path
-from collections import Counter
+import pandas as pd
 
 import docx
 import pymorphy2
@@ -29,20 +30,17 @@ def black_list(file):
     return black
 
 
-def pars_files(paths, fullname, file_b, file_o):
+def pars_files(paths, fullname, file_b, file_o, file_csv):
     """
-    Функция парсинга файлов
-    Args:
-        paths: пути
-        fullname: Фулнейм
-        file_b: файл с плохими словами
-        file_o: выходной файл
-
-    Returns:
-
+    Обработка парсинга
+    :param paths:  путь
+    :param fullname: имя пользователя
+    :param file_b: файл с плохими словами
+    :param file_o: файл для логгирования
+    :param file_csv: файл для статистики
     """
 
-    work = Work(paths, fullname, file_b, file_o)
+    work = Work(paths, fullname, file_b, file_o, file_csv)
     for elem in paths:
         if elem.endswith('.md' or '.txt'):
             check_word(elem, work)
@@ -70,6 +68,7 @@ def check_word(elem, work):
             key = parse(line, black)
             if key:
                 output(work, key)
+                csv_out('word', work.file_csv)
 
 
 def check_pptx(elem, work):
@@ -92,6 +91,7 @@ def check_pptx(elem, work):
                 key = parse(shape.text, black)
                 if key:
                     output(work, key)
+                    csv_out('pptx', work.file_csv)
 
 
 def check_docx(elem, work):
@@ -112,6 +112,7 @@ def check_docx(elem, work):
         key = parse(text, black)
         if key:
             output(work, key)
+            csv_out('docx', work.file_csv)
 
 
 def parse(text, blacklist):
@@ -119,7 +120,6 @@ def parse(text, blacklist):
     Парс файлов
     :param text: текст для парса
     :param blacklist: список плохих слов
-    :param work: класс для работы
     :return:
     """
     morph = pymorphy2.MorphAnalyzer()
@@ -192,9 +192,11 @@ def output(work, key):
 def csv_out(data, path_to_csv):
     """
     Выводит в файл csv
-    :param: file_obj - название файла
+    :param: data - нужная колонка
+    :param: path_to_csv - путь до файла
 
     :return:
+    """
     """
     dict_data = [Counter(data)]
     print(dict_data)
@@ -205,6 +207,12 @@ def csv_out(data, path_to_csv):
         writer.writeheader()
         for row in dict_data:
             writer.writerow(row)
+
+    """
+    df = pd.read_csv(path_to_csv, sep=':')
+    df.loc[0, data] += 1
+
+    df.to_csv(path_to_csv, index=False, sep=':')
 
 
 def get_project(project_ssh):

@@ -27,8 +27,7 @@ def search_all(token, output, blacklist, file_csv):
         paths = f.return_paths()
         print('Ищу в файлах.. ')
         # Парсим, выводим нужное
-        ret = f.pars_files(paths, fullname, blacklist, output)
-        f.csv_out(ret, file_csv)
+        f.pars_files(paths, fullname, blacklist, output, file_csv)
 
         # Удаляем проект
         f.delete_project(project_name.lower())
