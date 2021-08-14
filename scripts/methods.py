@@ -67,7 +67,9 @@ def check_word(elem, work):
     black = black_list(work.file_b)
     with codecs.open(elem, encoding='utf-8') as openfile:
         for line in openfile:
-            parse(line, black, work)
+            key = parse(line, black)
+            if key:
+                output(work, key)
 
 
 def check_pptx(elem, work):
@@ -87,7 +89,9 @@ def check_pptx(elem, work):
         for shape in slide.shapes:
             if hasattr(shape, "text"):
                 shape.text = shape.text.lower()
-                parse(shape.text, black, work)
+                key = parse(shape.text, black)
+                if key:
+                    output(work, key)
 
 
 def check_docx(elem, work):
@@ -105,10 +109,12 @@ def check_docx(elem, work):
 
     for paragraph in doc.paragraphs:
         text = paragraph.text.lower()
-        parse(text, black, work)
+        key = parse(text, black)
+        if key:
+            output(work, key)
 
 
-def parse(text, blacklist, work):
+def parse(text, blacklist):
     """
     Парс файлов
     :param text: текст для парса
@@ -121,18 +127,16 @@ def parse(text, blacklist, work):
     for key in blacklist:
         word = morph.parse(key)[0]
         if 'NOUN' in word.tag.POS:
-            for i in work.scl:
+            for i in ['nomn', 'gent', 'datv', 'accs', 'ablt', 'loct']:
                 search = r"\b" + word.inflect({i}).word + r"\S*\b"
                 if re.findall(search, text.lower()):
                     print(f"Найдено слово {key}")
-                    output(work, key)
                     return key
 
-            for i in work.scl:
+            for i in ['nomn', 'gent', 'datv', 'accs', 'ablt', 'loct']:
                 search = r"\b" + word.inflect({i, 'plur'}).word + r"\S*\b"
                 if re.findall(search, text.lower()):
                     print(f"Найдено слово {key}")
-                    output(work, key)
                     return key
 
 
@@ -222,7 +226,7 @@ def get_project(project_ssh):
     try:
         subprocess.check_output(args)
     except subprocess.CalledProcessError as e:
-        raise OSError from e
+        raise OSError('Ошибка загрузки') from e
 
 
 def get_proj_name(ssh):
@@ -241,13 +245,16 @@ def delete_project(name):
     :param name: название
     :return: None
     """
-    path_to_dir = './' + name
-    for root, dirs, files in os.walk(path_to_dir):
-        for dir in dirs:
-            os.chmod(path.join(root, dir), stat.S_IRWXU)
-        for file in files:
-            os.chmod(path.join(root, file), stat.S_IRWXU)
-    shutil.rmtree(path_to_dir)
+    try:
+        path_to_dir = './' + name
+        for root, dirs, files in os.walk(path_to_dir):
+            for dir in dirs:
+                os.chmod(path.join(root, dir), stat.S_IRWXU)
+            for file in files:
+                os.chmod(path.join(root, file), stat.S_IRWXU)
+        shutil.rmtree(path_to_dir)
+    except FileNotFoundError as f:
+        raise FileNotFoundError(f.strerror + ' ' + f.filename) from f
 
 
 def clear_file(file):
@@ -258,3 +265,4 @@ def clear_file(file):
     with open(file, "w") as f:
         f.truncate(0)
         f.close()
+    return True
