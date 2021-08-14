@@ -123,7 +123,6 @@ def parse(text, blacklist):
     :return:
     """
     morph = pymorphy2.MorphAnalyzer()
-
     for key in blacklist:
         word = morph.parse(key)[0]
         if 'NOUN' in word.tag.POS:
