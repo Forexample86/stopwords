@@ -10,9 +10,9 @@ from scripts.args import parse_args, check_args
 from scripts.methods import clear_file_logger, clear_file_csv
 
 # Дефолтные места
-OUTPUT = r'data\output.txt'
-BLACK_LIST = r'data\black_list.txt'
-FILE_CSV = r'data\formats.csv'
+OUTPUT = r'.\data\output.txt'
+BLACK_LIST = r'.\data\black_list.txt'
+FILE_CSV = r'.\data\formats.csv'
 
 
 if __name__ == '__main__':

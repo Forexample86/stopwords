@@ -1,0 +1,7 @@
+python-gitlab==2.6.0
+pymorphy2==0.9.1
+python-pptx==0.6.18
+regex==2021.4.4
+pylint==2.9.6
+pandas==1.2.4
+python-docx==0.8.10

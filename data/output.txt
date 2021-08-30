@@ -1,0 +1,2 @@
+fullname:  ForExample1090  ' | '  stop word: лейтенант
+fullname:  ForExample1090  ' | '  stop word: докер
