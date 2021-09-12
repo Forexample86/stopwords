@@ -3,6 +3,7 @@
 Программное средство поиска стоп-слов на gitlab.
 """
 import sys
+import subprocess
 
 from search_by_id import search_by_ssh
 from search_all import search_all
