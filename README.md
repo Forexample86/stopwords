@@ -6,6 +6,10 @@
 - Искать стоп-слова из black_list в файлах проекта по его ssh.
 - Выводить статистику по файлам с заданными расширениями в csv файл.
 
+# Важное примечание
+    
+    Для того, чтобы все работало, необходимо поместить файлы id.rsa, id_rsa.pub из своего файла .ssh в корень проекта.
+
 # Запуск pylint
 
     pylint main.py - pylint для main
@@ -55,7 +59,7 @@ Input file for file statistics
 **Запуск docker контейнера**
 
 ```bash
-	docker run --rm -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/format.csv -o /code/data/output.txt 
+	docker run --rm -p 8080:8080 -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
 ```
 
 **Возможные опции:**
@@ -63,11 +67,11 @@ Input file for file statistics
 -s(--project_ssh) <ssh> - поиск слов в проекте по его ssh:
 
 ```bash
-	docker run --rm -it stopwords -s <ssh> -t <token> -b /code/data/black_list.txt -f /code/data/format.csv -o /code/data/output.txt 
+	docker run --rm -p 8080:8080 -it stopwords -s <ssh> -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
 ```
 
 -a(--all) - поиск слов во всех проектах:
 
 ```bash
-	docker run --rm -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/format.csv -o /code/data/output.txt 
+	docker run --rm -p 8080:8080 -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
 ```
