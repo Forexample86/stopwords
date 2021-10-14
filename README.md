@@ -8,7 +8,7 @@
 
 # Важное примечание
     
-    Для того, чтобы все работало, необходимо поместить файлы id.rsa, id_rsa.pub из своего файла .ssh в корень проекта.
+    Для того, чтобы все работало, необходимо копировать файлы id.rsa, id_rsa.pub, known_hosts из своего файла .ssh в корень проекта.
 
 # Запуск pylint
 
@@ -59,7 +59,7 @@ Input file for file statistics
 **Запуск docker контейнера**
 
 ```bash
-	docker run --rm -p 8080:8080 -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
+	sudo docker run --rm  -p 8080:8080 -v /path/to/data:/code/data repo-size:1.0 -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
 ```
 
 **Возможные опции:**
@@ -67,11 +67,11 @@ Input file for file statistics
 -s(--project_ssh) <ssh> - поиск слов в проекте по его ssh:
 
 ```bash
-	docker run --rm -p 8080:8080 -it stopwords -s <ssh> -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
+	sudo docker run --rm -p 8080:8080 -v /path/to/data:/code/data repo-size:1.0 -it stopwords -s <ssh> -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
 ```
 
 -a(--all) - поиск слов во всех проектах:
 
 ```bash
-	docker run --rm -p 8080:8080 -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
+	sudo docker run --rm -p 8080:8080 -v /path/to/data:/code/data repo-size:1.0 -it stopwords -a -t <token> -b /code/data/black_list.txt -f /code/data/formats.csv -o /code/data/output.txt 
 ```
